@@ -140,13 +140,7 @@ export default function HomeScreen() {
   }
 
   const handleCarparkPress = (item: CarParkDataType) => {
-    router.push({
-      pathname: '/carpark/[id]',
-      params: {
-        id: item.id,
-        facilityName: item.name
-      }
-    });
+    router.push(`/carpark/${item.id}?facilityName=${encodeURIComponent(item.name)}`);
   };
 
   return (

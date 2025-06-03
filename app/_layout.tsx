@@ -6,14 +6,7 @@ export default function RootLayout() {
       <Stack.Screen 
         name="index" 
         options={{ 
-          title: 'Car Parks',
-          headerShown: true 
-        }} 
-      />
-      <Stack.Screen 
-        name="carpark/[id]" 
-        options={{ 
-          title: 'Car Park Details',
+          title: 'ParkView',
           headerShown: true 
         }} 
       />
