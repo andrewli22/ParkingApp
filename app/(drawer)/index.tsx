@@ -2,10 +2,10 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Button, SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { API_KEY } from '../config';
-import { URL } from '../utils/api';
-import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../utils/storage';
-import { CarParkDataType, SectionDataType } from '../utils/types';
+import { API_KEY } from '../../config';
+import { URL } from '../../utils/api';
+import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
+import { CarParkDataType, SectionDataType } from '../../utils/types';
 
 export default function HomeScreen() {
   const [data, setData] = useState<SectionDataType[]>([]);
@@ -33,10 +33,10 @@ export default function HomeScreen() {
         
         // Convert data to sectionList data structure then sort titles
         const sectionedData: SectionDataType[] = convertToSectionData(groupData(cleanedData));
-        sectionedData.sort((a, b) => (a.title.localeCompare(b.title)))
+        sectionedData.sort((a, b) => (a.title.localeCompare(b.title)));
 
         // Add the pinned carparks at the top of the list so it gets rendered first in the list
-        sectionedData.unshift(transformData(Object.entries(pinnedCarparks)))
+        sectionedData.unshift(transformData(Object.entries(pinnedCarparks)));
 
         setData(sectionedData);
       } catch (e) {
@@ -175,7 +175,7 @@ export default function HomeScreen() {
           )}
           renderSectionHeader={({ section: { title }}) => (
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionHeaderText}>{title}</Text>
+              <Text>{title}</Text>
             </View>
           )}
         />
@@ -207,9 +207,6 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 3,
     backgroundColor: '#e6e6fa'
-  },
-  sectionHeaderText: {
-    // textDecorationLine: 'underline'
   },
   textSize: {
     fontSize: 15
