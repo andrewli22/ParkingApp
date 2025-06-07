@@ -8,9 +8,8 @@ export default function DarkModeSlider(props: DrawerContentComponentProps) {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
-  
       <View style={{ paddingHorizontal: 20, paddingTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ fontSize: 16, color: '#333', fontWeight: '500' }}>Dark Mode</Text>
+        <Text style={{ fontSize: 16, fontWeight: '500', color: theme === 'dark' ? '#fff' : '#000', }}>Dark Mode</Text>
         <Switch
           trackColor={{false: '#767577', true: '#81b0ff'}}
           thumbColor={theme === 'dark' ? '#f5dd4b' : '#f4f3f4'}

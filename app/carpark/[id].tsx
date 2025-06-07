@@ -1,13 +1,17 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_KEY } from '../../config';
 import { URL } from '../../utils/api';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 
 export default function CarparkScreen() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const textColor = { color: theme === 'light' ? 'black' : 'white' };
+  const bgColor = theme === 'light' ? '#f2f2f2' : 'black';
   const params = useLocalSearchParams();
   const facilityName = String(params.facilityName || '');
 
@@ -55,10 +59,14 @@ export default function CarparkScreen() {
       <Stack.Screen 
         options={{ 
           title: facilityName || 'Carpark Details',
-          headerShown: true 
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: theme === 'dark' ? '#121212' : '#fff',
+          },
+          headerTintColor: theme === 'dark' ? '#fff' : '#000',
         }} 
       />
-      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#f2f2f2' : 'black' }]} edges={['left', 'right', 'bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
           refreshControl={
@@ -66,22 +74,22 @@ export default function CarparkScreen() {
           }
         >
           <View>
-            <Text style={{ fontSize: 25 }}>Number of spots available</Text>
+            <Text style={[textColor, { fontSize: 25 }]}>Number of spots available</Text>
           </View>
           <View style={styles.pieChart}>
             <View style={styles.pieTextContainer}>
-              <Text style={styles.pieText}>{spots - total} / {spots}</Text>
+              <Text style={[styles.pieText, textColor]}>{spots - total} / {spots}</Text>
             </View>
             <PieChart
               donut
               radius={150}
               innerRadius={130}
               data={pieData}
+              backgroundColor={theme === 'light' ? '#f2f2f2' : 'black'}
             />
           </View>
         </ScrollView>
       </SafeAreaView>
-      
     </>
   );
 }
