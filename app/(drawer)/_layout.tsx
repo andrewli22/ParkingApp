@@ -22,14 +22,14 @@ export default function DrawerLayout() {
       }}
     >
       <Drawer.Screen
-        name="index"
+        name='index'
         options={{
           drawerLabel: 'Home',
           title: 'Car Parks',
         }}
       />
       <Drawer.Screen
-        name="feedback"
+        name='feedback'
         options={{
           drawerLabel: 'Feedback',
           title: 'Feedback',

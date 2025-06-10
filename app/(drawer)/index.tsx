@@ -1,18 +1,18 @@
+import { useThemeStyles } from '@/utils/themeStyles';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { API_KEY } from '../../config';
 import { URL } from '../../utils/api';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
-import { ThemeContext } from '../contexts/ThemeContext';
 
 export default function HomeScreen() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
   const [data, setData] = useState<SectionDataType[]>([]);
   const [pinnedCarparks, setPinnedCarparks] = useState<{[key: string]: string}>({});
-
+  // Get device theme
+  const themeStyle = useThemeStyles();
   useEffect(() => {
     const fetchCarparks = async () => {
       try {
@@ -146,7 +146,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#f2f2f2' : 'black' }]}>
+    <SafeAreaView style={[styles.container, themeStyle.background]}>
       <StatusBar />
         <SectionList
           style={styles.carParkListContainer}
@@ -156,7 +156,7 @@ export default function HomeScreen() {
               onPress={() => handleCarparkPress(item)}
             >
               <View style={styles.carParkItemRow}>
-                <Text style={[styles.textSize, { color: theme === 'dark' ? 'white': 'black' }]}>{item.name}</Text>
+                <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
                 {section.title === 'Pinned' ? 
                   (
                     <Button 
@@ -176,8 +176,8 @@ export default function HomeScreen() {
             </TouchableOpacity>
           )}
           renderSectionHeader={({ section: { title }}) => (
-            <View style={[styles.sectionHeader, { backgroundColor: theme === 'light' ? '#b2b2b2' : '#3e4444' }]}>
-              <Text style={{ color: theme === 'dark' ? 'white': 'black' }}>{title}</Text>
+            <View style={[styles.sectionHeader, themeStyle.sectionHeader]}>
+              <Text style={themeStyle.textColor}>{title}</Text>
             </View>
           )}
         />

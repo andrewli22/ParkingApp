@@ -1,3 +1,4 @@
+import { useThemeStyles } from '@/utils/themeStyles';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -9,9 +10,11 @@ import { ThemeContext } from '../contexts/ThemeContext';
 
 
 export default function CarparkScreen() {
+  // Get device theme
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const textColor = { color: theme === 'light' ? 'black' : 'white' };
-  const bgColor = theme === 'light' ? '#f2f2f2' : 'black';
+  const themeStyle = useThemeStyles();
+
+  // Get carpark name
   const params = useLocalSearchParams();
   const facilityName = String(params.facilityName || '');
 
@@ -24,6 +27,7 @@ export default function CarparkScreen() {
     {value: spots-total, color: '#00D100'},
   ];
 
+  // Refresh screen when user scrolls down screen
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -32,6 +36,7 @@ export default function CarparkScreen() {
     }, 1000);
   }, []);
 
+  // Fetch carpark information
   const fetchCarParks = () => {
     try{
       fetch(URL+`/carpark?facility=${params.id}`, {
@@ -66,7 +71,7 @@ export default function CarparkScreen() {
           headerTintColor: theme === 'dark' ? '#fff' : '#000',
         }} 
       />
-      <SafeAreaView style={[styles.container, { backgroundColor: theme === 'light' ? '#f2f2f2' : 'black' }]} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView style={[styles.container, themeStyle.background]} edges={['left', 'right', 'bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
           refreshControl={
@@ -74,11 +79,11 @@ export default function CarparkScreen() {
           }
         >
           <View>
-            <Text style={[textColor, { fontSize: 25 }]}>Number of spots available</Text>
+            <Text style={[themeStyle.textColor, { fontSize: 25 }]}>Number of spots available</Text>
           </View>
           <View style={styles.pieChart}>
             <View style={styles.pieTextContainer}>
-              <Text style={[styles.pieText, textColor]}>{spots - total} / {spots}</Text>
+              <Text style={[styles.pieText, themeStyle.textColor]}>{spots - total} / {spots}</Text>
             </View>
             <PieChart
               donut
