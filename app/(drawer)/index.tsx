@@ -45,8 +45,10 @@ export default function HomeScreen() {
         console.error(e)
       }
     };
-    fetchCarparks();
-  }, []);
+    if (pinnedCarparks) {
+      fetchCarparks();
+    }
+  }, [pinnedCarparks]);
 
   // Group data by first letter of carpark name
   const groupData = (data: string[][]) => {

@@ -51,7 +51,7 @@ export default function IssuesScreen() {
           key={theme}
           placeholderTextColor={themeStyle.textColor.color}
           multiline
-          placeholder="Enter feedback"
+          placeholder="Describe the issue"
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200 }]}
         />
         <TouchableOpacity style={styles.submitButtonContainer}>
