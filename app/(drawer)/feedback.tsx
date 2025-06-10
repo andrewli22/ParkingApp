@@ -1,27 +1,36 @@
-import React from "react"
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { useThemeStyles } from '@/utils/themeStyles';
+import React, { useContext } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 export default function FeedbackScreen() {
-  
+  const themeStyle = useThemeStyles();
+  const { theme, toggleTheme } = useContext(ThemeContext)
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection:'row', justifyContent: 'center' }}>
-        <Text style={{ fontSize: 20, textAlign: 'center' }}>Please provide your feedback below.</Text>
+    <View style={[styles.container, themeStyle.background, { flex: 1 }]}>
+      <View style={{ flexDirection:'row', justifyContent: 'center', margin: 20 }}>
+        <Text style={[themeStyle.textColor, { fontSize: 15, textAlign: 'center' }]}>Please provide your feedback below</Text>
       </View>
-      <TextInput
-        placeholder="Name"
-        style={styles.textInputStyles}
-      />
-      <TextInput
-        placeholder="Email address"
-        style={styles.textInputStyles}
+      <View style={{ gap:10, marginHorizontal: 20 }}>
+        <TextInput
+          placeholder='Name'
+          placeholderTextColor={themeStyle.textColor.color}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
         />
-      <TextInput
-        multiline
-        placeholder="Enter feedback"
-        style={[styles.textInputStyles, { height: 200 }]}
-      />
-      <TouchableOpacity style={styles.submitButtonContainer}>
+        <TextInput
+          placeholder='Email address'
+          placeholderTextColor={themeStyle.textColor.color}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
+          />
+        <TextInput
+          key={theme}
+          multiline
+          placeholder='Enter feedback'
+          placeholderTextColor={themeStyle.textColor.color}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200 }]}
+        />
+      </View>
+      <TouchableOpacity style={[styles.submitButtonContainer, { marginHorizontal: 20 }]}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
     </View>
@@ -31,8 +40,6 @@ export default function FeedbackScreen() {
 const styles = StyleSheet.create({
   container: {
     gap: 20,
-    marginHorizontal: 40,
-    marginTop: 20,
   },
   textInputStyles: {
     borderWidth: 2,

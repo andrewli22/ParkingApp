@@ -35,6 +35,13 @@ export default function DrawerLayout() {
           title: 'Feedback',
         }}
       />
+      <Drawer.Screen
+        name='issues'
+        options={{
+          drawerLabel: 'Report an issue',
+          title: 'Report an Issue',
+        }}
+      />
     </Drawer>
   );
 };
