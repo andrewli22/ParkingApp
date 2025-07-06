@@ -4,8 +4,6 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { API_KEY } from '../../config';
-import { URL } from '../../utils/api';
 import { ThemeContext } from '../contexts/ThemeContext';
 
 
@@ -28,36 +26,36 @@ export default function CarparkScreen() {
   ];
 
   // Refresh screen when user scrolls down screen
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      fetchCarParks();
-    }, 1000);
-  }, []);
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  //   setTimeout(() => {
+  //     setRefreshing(false);
+  //     fetchCarParks();
+  //   }, 1000);
+  // }, []);
 
   // Fetch carpark information
-  const fetchCarParks = () => {
-    try{
-      fetch(URL+`/carpark?facility=${params.id}`, {
-        headers: {
-          'Authorization': `apikey ${API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setTotal(Number(data.occupancy.total));
-          setSpots(Number(data.spots));
-        });
-    } catch (e) {
-      console.error(e)
-    }
-  };
+  // const fetchCarParks = () => {
+  //   try{
+  //     fetch(URL+`/carpark?facility=${params.id}`, {
+  //       headers: {
+  //         'Authorization': `apikey ${API_KEY}`,
+  //         'Content-Type': 'application/json'
+  //       }
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         setTotal(Number(data.occupancy.total));
+  //         setSpots(Number(data.spots));
+  //       });
+  //   } catch (e) {
+  //     console.error(e)
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchCarParks();
-  }, [])
+  // useEffect(() => {
+  //   fetchCarParks();
+  // }, [])
   
   return (
     <>
@@ -74,9 +72,9 @@ export default function CarparkScreen() {
       <SafeAreaView style={[styles.container, themeStyle.background]} edges={['left', 'right', 'bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          // refreshControl={
+          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          // }
         >
           <View>
             <Text style={[themeStyle.textColor, { fontSize: 25 }]}>Number of spots available</Text>

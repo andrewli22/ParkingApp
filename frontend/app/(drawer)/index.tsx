@@ -3,10 +3,9 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Button, SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { API_KEY } from '../../config';
-import { URL } from '../../utils/api';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
+import { fetchAllCarparks } from '@/utils/api';
 
 export default function HomeScreen() {
   const [data, setData] = useState<SectionDataType[]>([]);
@@ -16,18 +15,8 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchCarparks = async () => {
       try {
-        const response = await fetch(URL+'/carpark', {
-          headers: {
-            'Authorization': `apikey ${API_KEY}`,
-            'Content-Type': 'application/json'
-          }
-        })
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch carparks: ${response.statusText}`);
-        }
-
-        const carparks: Record<string, string> = await response.json();
+        const carparks: Record<string, string> = await fetchAllCarparks();
+        
         // Remove historical data and filter out pinned carparks
         const cleanedData = Object.entries(carparks).slice(5)
           .filter(([id]) => !(id in pinnedCarparks))
@@ -42,9 +31,10 @@ export default function HomeScreen() {
 
         setData(sectionedData);
       } catch (e) {
-        console.error(e)
+        console.error('Error fetching carparks:', e);
       }
     };
+
     if (pinnedCarparks) {
       fetchCarparks();
     }
