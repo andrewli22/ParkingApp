@@ -1,178 +1,186 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { Button, SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
 import { fetchAllCarparks } from '@/utils/api';
+import { useApiCounter } from '../contexts/ApiCounterContext';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function HomeScreen() {
-  const [data, setData] = useState<SectionDataType[]>([]);
+  const { apiCallCount, incrementApiCall } = useApiCounter();
+  const [allCarparks, setAllCarparks] = useState<Record<string, string>>({});
   const [pinnedCarparks, setPinnedCarparks] = useState<{[key: string]: string}>({});
+  const [isLoading, setIsLoading] = useState(true);
+  
   // Get device theme
   const themeStyle = useThemeStyles();
+
+  // Fetch all carparks only once on mount
   useEffect(() => {
     const fetchCarparks = async () => {
       try {
+        setIsLoading(true);
         const carparks: Record<string, string> = await fetchAllCarparks();
+        // Remove historical data and clean names
+        const cleanedData = Object.entries(carparks)
+          .slice(5)
+          .reduce((acc, [key, value]) => {
+            acc[key] = value.slice(12);
+            return acc;
+          }, {} as Record<string, string>);
         
-        // Remove historical data and filter out pinned carparks
-        const cleanedData = Object.entries(carparks).slice(5)
-          .filter(([id]) => !(id in pinnedCarparks))
-          .map(([key, value]) => [key, value.slice(12)]);
-        
-        // Convert data to sectionList data structure then sort titles
-        const sectionedData: SectionDataType[] = convertToSectionData(groupData(cleanedData));
-        sectionedData.sort((a, b) => (a.title.localeCompare(b.title)));
-
-        // Add the pinned carparks at the top of the list so it gets rendered first in the list
-        sectionedData.unshift(transformData(Object.entries(pinnedCarparks)));
-
-        setData(sectionedData);
+        setAllCarparks(cleanedData);
+        incrementApiCall();
       } catch (e) {
         console.error('Error fetching carparks:', e);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (pinnedCarparks) {
-      fetchCarparks();
-    }
-  }, [pinnedCarparks]);
+    fetchCarparks();
+  }, []);
 
-  // Group data by first letter of carpark name
-  const groupData = (data: string[][]) => {
-    return data.reduce((acc, [id, carpark]) => {
-      const firstLetter = carpark.charAt(0).toUpperCase();
+  // Fetch pinned carparks only once on mount
+  useEffect(() => {
+    const getPinnedCP = async () => {
+      try {
+        const res = await fetchPinnedCarparks();
+        setPinnedCarparks(res || {});
+      } catch (e) {
+        console.error('Error fetching pinned carparks:', e);
+      }
+    };
+    getPinnedCP();
+  }, []);
+
+  // Cache processed carpark list so it only recalculates allCarparks or pinnedCarparks change
+  const sectionData = useMemo(() => {
+    if (isLoading || Object.keys(allCarparks).length === 0) return [];
+
+    // Filter out pinned carparks from the main list
+    const unpinnedEntries = Object.entries(allCarparks)
+      .filter(([id]) => !(id in pinnedCarparks));
+
+    // Group by first letter
+    const grouped = unpinnedEntries.reduce((acc, [id, name]) => {
+      const firstLetter = name.charAt(0).toUpperCase();
       if (!acc[firstLetter]) {
         acc[firstLetter] = [];
       }
-      acc[firstLetter].push({ id, name: carpark });
+      acc[firstLetter].push({ id, name });
       return acc;
     }, {} as Record<string, CarParkDataType[]>);
-  };
-  
-  // convert to appropriate data structure to render sectionList
-  const convertToSectionData = (groupedData: Record<string, CarParkDataType[]>) => {
-    return Object.entries(groupedData).map(([title, data]) => ({ title, data }));
-  };
 
-  const transformData = (pinnedCP: string[][]) => {
-    return {
-      title: 'Pinned',
-      data: pinnedCP.map((cp) => ({
-        id: cp[0],
-        name: cp[1]
+    // Convert to section data and sort
+    const sections: SectionDataType[] = Object.entries(grouped)
+      .map(([title, data]) => ({ 
+        title, 
+        data: data.sort((a, b) => a.name.localeCompare(b.name)) 
       }))
-    };
-  }
+      .sort((a, b) => a.title.localeCompare(b.title));
 
-  useEffect(() => {
-    const getPinnedCP = async () => {
-      const res = await fetchPinnedCarparks();
-      setPinnedCarparks(res);
+    // Add pinned section at the top if there are pinned carparks
+    if (Object.keys(pinnedCarparks).length > 0) {
+      const pinnedSection: SectionDataType = {
+        title: 'Pinned',
+        data: Object.entries(pinnedCarparks)
+          .map(([id, name]) => ({ id, name }))
+          .sort((a, b) => a.name.localeCompare(b.name))
+      };
+      sections.unshift(pinnedSection);
     }
-    getPinnedCP();
-  }, [])
 
-  const handlePinCarpark = async (id: string, carpark: string) => {
-    await handleStoreCarparks({ id, carpark });
-    setData((prevData) => {
-      const newCarpark = { 'id': id, 'name': carpark };
-      const sourceSection = carpark.charAt(0);
+    return sections;
+  }, [allCarparks, pinnedCarparks, isLoading]);
+
+  const handlePinCarpark = useCallback(async (id: string, carpark: string) => {
+    try {
+      setPinnedCarparks(prev => ({ ...prev, [id]: carpark }));
       
-      // Create new array with all updates at once
-      return (prevData.map(section => {
-        switch (section.title) {
-          case sourceSection:
-            // Remove from original section
-            return {
-              ...section,
-              data: section.data.filter((cp) => cp.id !== id)
-            };
-            
-          case 'Pinned':
-            // Add to pinned section
-            return {
-              ...section,
-              data: [...section.data, newCarpark]
-            };
-            
-          default:
-            return section;
-        }
-      }));
-    });
-  }
+      // Update AsyncStorage
+      await handleStoreCarparks({ id, carpark });
+    } catch (error) {
+      console.error('Error pinning carpark:', error);
+      // Revert optimistic update on error
+      setPinnedCarparks(prev => {
+        const { [id]: removed, ...rest } = prev;
+        return rest;
+      });
+    }
+  }, []);
 
-  const handleUnpinCarpark = async (id: string, carpark: string) => {
-    await removePinnedCarpark(id);
-    setData((prevData) => {
-      const sourceSection = carpark.charAt(0);
-      const unpinnedCarpark = { 'id': id, 'name': carpark }
-      return (
-        prevData.map((section) => {
-          switch(section.title) {
-            // Add to corresponding section
-            case sourceSection:
-              return {
-                ...section,
-                data: [...section.data, unpinnedCarpark]
-              }
-            // Remove from pinned section
-            case 'Pinned':
-              return {
-                ...section,
-                data: section.data.filter((cp) => cp.id !== id)
-              }
-            default:
-              return section
-          }
-        })
-      )
-    })
-  }
+  const handleUnpinCarpark = useCallback(async (id: string) => {
+    const originalValue = pinnedCarparks[id];
+    
+    try {
+      setPinnedCarparks(prev => {
+        const { [id]: removed, ...rest } = prev;
+        return rest;
+      });
+      
+      // Update AsyncStorage
+      await removePinnedCarpark(id);
+    } catch (error) {
+      console.error('Error unpinning carpark:', error);
+      // Revert optimistic update on error
+      setPinnedCarparks(prev => ({ ...prev, [id]: originalValue }));
+    }
+  }, [pinnedCarparks]);
 
-  const handleCarparkPress = (item: CarParkDataType) => {
+  const handleCarparkPress = useCallback((item: CarParkDataType) => {
     router.push(`/carpark/${item.id}?facilityName=${encodeURIComponent(item.name)}`);
-  };
+  }, []);
+
+  const renderItem = useCallback(({ item, section }: { item: CarParkDataType; section: SectionDataType }) => (
+    <TouchableOpacity onPress={() => handleCarparkPress(item)}>
+      <View style={styles.carParkItemRow}>
+        <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
+        {section.title === 'Pinned' ? (
+          <TouchableOpacity onPress={() => handleUnpinCarpark(item.id)}>
+            <AntDesign name="star" size={24} color="gold" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => handlePinCarpark(item.id, item.name)}>
+            <AntDesign name="staro" size={24} color={themeStyle.textColor.color} />
+          </TouchableOpacity>
+        )}
+      </View>
+    </TouchableOpacity>
+  ), [themeStyle, handlePinCarpark, handleUnpinCarpark, handleCarparkPress]);
+
+  const renderSectionHeader = useCallback(({ section: { title } }: { section: { title: string } }) => (
+    <View style={[styles.sectionHeader, themeStyle.sectionHeader]}>
+      <Text style={[styles.sectionHeaderText, themeStyle.textColor]}>{title}</Text>
+    </View>
+  ), [themeStyle]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, themeStyle.background]}>
+        <View style={styles.loadingContainer}>
+          <Text style={themeStyle.textColor}>Loading carparks...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, themeStyle.background]}>
       <StatusBar />
-        <SectionList
-          style={styles.carParkListContainer}
-          sections={data.filter((section) => section.data.length > 0)}
-          renderItem={({ item, section }) => (
-            <TouchableOpacity
-              onPress={() => handleCarparkPress(item)}
-            >
-              <View style={styles.carParkItemRow}>
-                <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
-                {section.title === 'Pinned' ? 
-                  (
-                    <Button 
-                      title='Unpin'
-                      onPress={() => handleUnpinCarpark(item.id, item.name)}
-                    />
-                  )
-                  :
-                  (
-                    <Button 
-                      title='Pin'
-                      onPress={() => handlePinCarpark(item.id, item.name)}
-                    />
-                  )
-                }
-              </View>
-            </TouchableOpacity>
-          )}
-          renderSectionHeader={({ section: { title }}) => (
-            <View style={[styles.sectionHeader, themeStyle.sectionHeader]}>
-              <Text style={themeStyle.textColor}>{title}</Text>
-            </View>
-          )}
-        />
+      <SectionList
+        style={styles.carParkListContainer}
+        sections={sectionData}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        keyExtractor={(item) => item.id}
+        removeClippedSubviews={true} // Performance optimization
+        maxToRenderPerBatch={20} // Performance optimization
+        updateCellsBatchingPeriod={50} // Performance optimization
+      />
     </SafeAreaView>
   );
 }
@@ -193,16 +201,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 5,
+    padding: 12,
     marginBottom: 0,
     marginHorizontal: 5
   },
   sectionHeader: {
     width: '100%',
-    padding: 3,
+    padding: 4,
     backgroundColor: '#e6e6fa'
+  },
+  sectionHeaderText: {
+    fontSize: 14,
+    fontWeight: '600'
   },
   textSize: {
     fontSize: 15
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });

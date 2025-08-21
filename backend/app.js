@@ -26,7 +26,7 @@ app.get('/api/carparks', async (req, res) => {
 
 app.get('/api/carparks/:id', async (req, res) => {
   try {
-    const response = await fetch(`${process.env.PARKING_API_URL}/carpark/${req.params.id}`, {
+    const response = await fetch(`${process.env.PARKING_API_URL}/carpark?facility=${req.params.id}`, {
       headers: {
         'Authorization': `apikey ${process.env.PARKING_API_KEY}`,
         'Content-Type': 'application/json'

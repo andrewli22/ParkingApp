@@ -5,9 +5,13 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { fetchCarparkById } from '@/utils/api';
+import { useApiCounter } from '../contexts/ApiCounterContext';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 
 export default function CarparkScreen() {
+  const { apiCallCount, incrementApiCall } = useApiCounter()
   // Get device theme
   const { theme, toggleTheme } = useContext(ThemeContext);
   const themeStyle = useThemeStyles();
@@ -15,47 +19,70 @@ export default function CarparkScreen() {
   // Get carpark name
   const params = useLocalSearchParams();
   const facilityName = String(params.facilityName || '');
+  const facilityId = String(params.id || '');
 
   const [refreshing, setRefreshing] = useState(false);
   const [spots, setSpots] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
+  // Calculate percentages for better visualization of small segments
+  const occupiedPercent = Math.round((total / spots) * 100);
+  const vacantPercent = 100 - occupiedPercent;
+  
   const pieData = [
-    {value: total , color: '#FF2E2E'},
-    {value: spots-total, color: '#00D100'},
+    {value: occupiedPercent, color: '#FF2E2E'},
+    {value: vacantPercent, color: '#00D100'},
   ];
 
+
   // Refresh screen when user scrolls down screen
-  // const onRefresh = useCallback(() => {
-  //   setRefreshing(true);
-  //   setTimeout(() => {
-  //     setRefreshing(false);
-  //     fetchCarParks();
-  //   }, 1000);
-  // }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const data = await fetchCarparkById(facilityId);
+      setSpots(data.spots);
+      setTotal(data.occupancy.total);
+      setLastUpdated(new Date());
+      incrementApiCall();
+    } catch (e) {
+      console.error(`Error fetching carpark ${facilityId}`);
+    }
+    setRefreshing(false);
+  }, [facilityId]);
 
   // Fetch carpark information
-  // const fetchCarParks = () => {
-  //   try{
-  //     fetch(URL+`/carpark?facility=${params.id}`, {
-  //       headers: {
-  //         'Authorization': `apikey ${API_KEY}`,
-  //         'Content-Type': 'application/json'
-  //       }
-  //     })
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         setTotal(Number(data.occupancy.total));
-  //         setSpots(Number(data.spots));
-  //       });
-  //   } catch (e) {
-  //     console.error(e)
-  //   }
-  // };
+  useEffect(() => {
+    const fetchCarpark = async () => {
+      try {
+        const data = await fetchCarparkById(facilityId);
+        setSpots(data.spots);
+        setTotal(data.occupancy.total);
+        setLastUpdated(new Date());
+        incrementApiCall();
+      } catch (e) {
+        console.error(`Error fetching carpark ${facilityId}`)
+      }
+    }
+    fetchCarpark();
+  }, [])
 
-  // useEffect(() => {
-  //   fetchCarParks();
-  // }, [])
+  // Format last updated time
+  const formatLastUpdated = (date: Date | null) => {
+    if (!date) return 'Never updated';
+    
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
+  };
+
   
   return (
     <>
@@ -72,24 +99,51 @@ export default function CarparkScreen() {
       <SafeAreaView style={[styles.container, themeStyle.background]} edges={['left', 'right', 'bottom']}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
-          // refreshControl={
-          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          // }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         >
           <View>
             <Text style={[themeStyle.textColor, { fontSize: 25 }]}>Number of spots available</Text>
           </View>
           <View style={styles.pieChart}>
-            <View style={styles.pieTextContainer}>
-              <Text style={[styles.pieText, themeStyle.textColor]}>{spots - total} / {spots}</Text>
+            <View style={styles.chartContainer}>
+              <PieChart
+                donut
+                radius={150}
+                innerRadius={130}
+                data={pieData}
+                backgroundColor={theme === 'light' ? '#f2f2f2' : 'black'}
+                strokeWidth={2}
+                strokeColor={theme === 'light' ? '#fff' : '#121212'}
+              />
+              <View style={styles.chartTextContainer}>
+                <Text style={[styles.chartMainNumber, themeStyle.textColor]}>{spots - total}</Text>
+                <Text style={[styles.chartSubText, themeStyle.textColor]}>Vacant Spots</Text>
+                <Text style={[styles.chartPercentage, themeStyle.textColor]}>{vacantPercent}% available</Text>
+              </View>
             </View>
-            <PieChart
-              donut
-              radius={150}
-              innerRadius={130}
-              data={pieData}
-              backgroundColor={theme === 'light' ? '#f2f2f2' : 'black'}
-            />
+            
+            <View style={styles.legendContainer}>
+              <View style={styles.legendItem}>
+                <View style={styles.legendDotGreen} />
+                <Text style={[styles.legendText, themeStyle.textColor]}>Vacant: {spots - total}</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={styles.legendDotRed} />
+                <Text style={[styles.legendText, themeStyle.textColor]}>Occupied: {total}</Text>
+              </View>
+            </View>
+            <View style={styles.lastUpdatedContainer}>
+              <View style={styles.updateRow}>
+                <Text style={[styles.clockIcon, themeStyle.textColor]}>
+                  <MaterialIcons name="update" size={18} color="black" />
+                </Text>
+                <Text style={[styles.lastUpdatedText, themeStyle.textColor]}>
+                  Updated: {formatLastUpdated(lastUpdated)}
+                </Text>
+              </View>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -113,17 +167,76 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 50
+    gap: 30,
+    transform: [{ translateY: -20 }]
   },
-  pieText: {
-    flex: 1,
+  chartContainer: {
+    position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: 40
   },
-  pieTextContainer: {
-    zIndex: 1,
+  chartTextContainer: {
     position: 'absolute',
-    top: 310
-  }
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chartMainNumber: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  chartSubText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  chartPercentage: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 2,
+    opacity: 0.7,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+    paddingHorizontal: 20,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendDotGreen: {
+    width: 20,
+    height: 20,
+    borderRadius: '100%',
+    backgroundColor: '#00D100',
+  },
+  legendDotRed: {
+    width: 20,
+    height: 20,
+    borderRadius: '100%',
+    backgroundColor: '#FF2E2E',
+  },
+  legendText: {
+    fontSize: 17,
+    fontWeight: '500',
+  },
+  lastUpdatedContainer: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+  },
+  updateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  clockIcon: {
+    fontSize: 14,
+  },
+  lastUpdatedText: {
+    fontSize: 15,
+    opacity: 0.6,
+  },
 });

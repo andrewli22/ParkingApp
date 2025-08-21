@@ -9,7 +9,7 @@ export const fetchAllCarparks = async () => {
         'Content-Type': 'application/json'
       }
     });
-
+    
     if (!response.ok) {
       throw new Error(`Failed to fetch carparks: ${response.statusText}`);
     }
@@ -23,21 +23,20 @@ export const fetchAllCarparks = async () => {
 };
 
 export const fetchCarparkById = async (id: string) => {
-  console.log(id);
   try {
     const response = await fetch(`${BASE_URL}/carparks/${id}`, {
       headers: {
         'Content-Type': 'application/json'
       }
     });
-
+    
     if (!response.ok) {
       if (response.status === 404) {
         return null;
       }
       throw new Error(`Failed to fetch carpark ${id}: ${response.statusText}`);
     }
-
+    
     const carpark = await response.json();
     return carpark;
   } catch (error) {
