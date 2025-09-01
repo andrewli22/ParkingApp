@@ -2,15 +2,31 @@ import { useThemeStyles } from '@/utils/themeStyles';
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { sendFeedback } from '@/utils/api';
 
 export default function FeedbackScreen() {
   const themeStyle = useThemeStyles();
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   // User inputs
-  const [name, setName] = useState<String>('');
-  const [email, setEmail] = useState<String>('');
-  const [feedback, setFeedback] = useState<String>('');
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [feedback, setFeedback] = useState<string>('');
+  const [success, setSuccess] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const handleSendFeedback = async () => {
+    setErrorMessage('');
+    try {
+      console.log('button clicked');
+      const res = await sendFeedback(name, email, feedback);
+      console.log(`success: ${res}`);
+      setSuccess(true);
+    } catch (error) {
+      console.error('API error sending feedback - frontend', error);
+      setErrorMessage('Failed to send feedback. Please try again.');
+    }
+  }
 
   return (
     <View style={[styles.container, themeStyle.background, { flex: 1 }]}>
@@ -40,8 +56,21 @@ export default function FeedbackScreen() {
         />
       </View>
       <TouchableOpacity style={[styles.submitButtonContainer, { marginHorizontal: 20 }]}>
-        <Text style={styles.buttonText}>Submit</Text>
+        <Text style={styles.buttonText} onPress={() => handleSendFeedback()}>Submit</Text>
       </TouchableOpacity>
+      {/* Success message */}
+      {success && (
+        <Text style={[themeStyle.textColor]}>
+          Thanks for your feedback. A team member will review it soon!
+        </Text>
+      )}
+      
+      {/* Error message */}
+      {errorMessage && (
+        <Text style={[{ color: 'red' }]}>
+          {errorMessage}
+        </Text>
+      )}
     </View>
   )
 }

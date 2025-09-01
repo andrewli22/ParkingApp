@@ -94,6 +94,7 @@ export default function CarparkScreen() {
             backgroundColor: theme === 'dark' ? '#121212' : '#fff',
           },
           headerTintColor: theme === 'dark' ? '#fff' : '#000',
+          headerBackTitle: 'Back'
         }} 
       />
       <SafeAreaView style={[styles.container, themeStyle.background]} edges={['left', 'right', 'bottom']}>
