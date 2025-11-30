@@ -55,8 +55,8 @@ export default function FeedbackScreen() {
           onChangeText={setFeedback}
         />
       </View>
-      <TouchableOpacity style={[styles.submitButtonContainer, { marginHorizontal: 20 }]}>
-        <Text style={styles.buttonText} onPress={() => handleSendFeedback()}>Submit</Text>
+      <TouchableOpacity style={[styles.submitButtonContainer, { marginHorizontal: 20 }]} onPress={() => handleSendFeedback()}>
+        <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
       {/* Success message */}
       {success && (

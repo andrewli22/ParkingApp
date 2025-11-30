@@ -25,6 +25,7 @@ export default function CarparkScreen() {
   const [spots, setSpots] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   // Calculate percentages for better visualization of small segments
   const occupiedPercent = Math.round((total / spots) * 100);
@@ -67,19 +68,30 @@ export default function CarparkScreen() {
     fetchCarpark();
   }, [])
 
+  // Update current time every 5 seconds to refresh the "time ago" display
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   // Format last updated time
   const formatLastUpdated = (date: Date | null) => {
     if (!date) return 'Never updated';
-    
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
+
+    const diffInSeconds = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 10) return 'Just now';
+    if (diffInSeconds < 60) return `${diffInSeconds} second${diffInSeconds > 1 ? 's' : ''} ago`;
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
-    
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -119,16 +131,16 @@ export default function CarparkScreen() {
                 strokeColor={theme === 'light' ? '#fff' : '#121212'}
               />
               <View style={styles.chartTextContainer}>
-                <Text style={[styles.chartMainNumber, themeStyle.textColor]}>{spots - total}</Text>
+                <Text style={[styles.chartMainNumber, themeStyle.textColor]}>{spots - total < 0 ? 0 : spots - total}</Text>
                 <Text style={[styles.chartSubText, themeStyle.textColor]}>Vacant Spots</Text>
-                <Text style={[styles.chartPercentage, themeStyle.textColor]}>{vacantPercent}% available</Text>
+                <Text style={[styles.chartPercentage, themeStyle.textColor]}>{vacantPercent < 0 ? 0 : vacantPercent}% available</Text>
               </View>
             </View>
             
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
                 <View style={styles.legendDotGreen} />
-                <Text style={[styles.legendText, themeStyle.textColor]}>Vacant: {spots - total}</Text>
+                <Text style={[styles.legendText, themeStyle.textColor]}>Vacant: {spots - total < 0 ? 0 : spots - total}</Text>
               </View>
               <View style={styles.legendItem}>
                 <View style={styles.legendDotRed} />
