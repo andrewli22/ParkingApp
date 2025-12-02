@@ -6,15 +6,14 @@ import { SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } f
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
 import { fetchAllCarparks } from '@/utils/api';
-import { useApiCounter } from '../contexts/ApiCounterContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Footer from '../components/Footer';
 
 export default function HomeScreen() {
-  const { apiCallCount, incrementApiCall } = useApiCounter();
   const [allCarparks, setAllCarparks] = useState<Record<string, string>>({});
   const [pinnedCarparks, setPinnedCarparks] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Get device theme
   const themeStyle = useThemeStyles();
 
@@ -31,9 +30,7 @@ export default function HomeScreen() {
             acc[key] = value.slice(12);
             return acc;
           }, {} as Record<string, string>);
-        
         setAllCarparks(cleanedData);
-        incrementApiCall();
       } catch (e) {
         console.error('Error fetching carparks:', e);
       } finally {
@@ -181,6 +178,7 @@ export default function HomeScreen() {
         maxToRenderPerBatch={20} // Performance optimization
         updateCellsBatchingPeriod={50} // Performance optimization
       />
+      <Footer />
     </SafeAreaView>
   );
 }

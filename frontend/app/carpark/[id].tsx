@@ -6,12 +6,9 @@ import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { fetchCarparkById } from '@/utils/api';
-import { useApiCounter } from '../contexts/ApiCounterContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-
 export default function CarparkScreen() {
-  const { apiCallCount, incrementApiCall } = useApiCounter()
   // Get device theme
   const { theme, toggleTheme } = useContext(ThemeContext);
   const themeStyle = useThemeStyles();
@@ -45,7 +42,6 @@ export default function CarparkScreen() {
       setSpots(data.spots);
       setTotal(data.occupancy.total);
       setLastUpdated(new Date());
-      incrementApiCall();
     } catch (e) {
       console.error(`Error fetching carpark ${facilityId}`);
     }
@@ -60,7 +56,6 @@ export default function CarparkScreen() {
         setSpots(data.spots);
         setTotal(data.occupancy.total);
         setLastUpdated(new Date());
-        incrementApiCall();
       } catch (e) {
         console.error(`Error fetching carpark ${facilityId}`)
       }
