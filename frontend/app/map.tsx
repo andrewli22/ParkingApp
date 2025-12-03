@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Footer from './components/Footer';
 import * as Location from 'expo-location';
@@ -8,12 +8,10 @@ import { router } from 'expo-router';
 import { locations } from '../locations';
 
 interface Carpark {
-  facility: string;
-  name: string;
-  location?: {
-    lat: number;
-    long: number;
-  };
+  facilityId: string,
+  latitude: number,
+  longitude: number,
+  suburb: string
 }
 
 export default function MapScreen() {
@@ -34,13 +32,12 @@ export default function MapScreen() {
   }, []);
 
   const handleMarkerPress = (carpark: Carpark) => {
-    router.push(`/carpark/${carpark.facility}?facilityName=${encodeURIComponent(carpark.name)}`);
+    router.push(`/carpark/${carpark.facilityId}?facilityName=${encodeURIComponent(carpark.suburb)}`);
   };
 
   return (
-    <>
+    <SafeAreaView style={styles.container}>
       <StatusBar />
-      <View style={styles.container}>
         {errorMsg ? (
           <View style={styles.errorContainer}>
             <Text>{errorMsg}</Text>
@@ -65,24 +62,24 @@ export default function MapScreen() {
           >
             {
               locations.map((marker, index) => (
-                <Marker key={index} coordinate={marker} />
+                <Marker key={index} coordinate={marker} onPress={() => handleMarkerPress(marker)} />
               ))
             }
           </MapView>
         )}
-      </View>
       <Footer />
-    </>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
   },
   map: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
+    marginBottom: 10
   },
   errorContainer: {
     flex: 1,
