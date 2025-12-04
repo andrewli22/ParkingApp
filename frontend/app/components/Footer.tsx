@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { router, usePathname } from 'expo-router';
+import { useThemeStyles } from '@/utils/themeStyles';
 
 export default function Footer() {
   const pathname = usePathname();
+  const themeStyle = useThemeStyles();
 
   const handleNavigateToMap = () => {
     router.push('/map');
@@ -17,8 +19,8 @@ export default function Footer() {
   const isMapActive = pathname === '/map';
 
   return (
-    <View style={styles.container}>
-      <View style={styles.segmentedControl}>
+    <View style={[styles.container, themeStyle.background]}>
+      <View style={[styles.segmentedControl, themeStyle.sectionHeader]}>
         <TouchableOpacity
           style={[
             styles.button,
@@ -27,7 +29,7 @@ export default function Footer() {
           ]}
           onPress={() => handleNavigateToNames()}
         >
-          <Text style={[styles.buttonText, isNameActive && styles.activeButtonText]}>Name</Text>
+          <Text style={[styles.buttonText, isNameActive && styles.activeButtonText, {color: 'white'}]}>Name</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -37,7 +39,7 @@ export default function Footer() {
           ]}
           onPress={() => handleNavigateToMap()}
         >
-          <Text style={[styles.buttonText, isMapActive && styles.activeButtonText]}>Map</Text>
+          <Text style={[styles.buttonText, isMapActive && styles.activeButtonText, {color: 'white'}]}>Map</Text>
         </TouchableOpacity>
       </View>
     </View>

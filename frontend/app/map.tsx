@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View, Text, SafeAreaView, StatusBar} from 'react-native';
 import Footer from './components/Footer';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { locations } from '../locations';
+import { useTheme } from './contexts/ThemeContext';
+import { useThemeStyles } from '@/utils/themeStyles';
+import { mapDarkStyle } from '@/utils/mapStyles';
 
 interface Carpark {
   facilityId: string,
@@ -17,6 +19,8 @@ interface Carpark {
 export default function MapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { theme } = useTheme();
+  const themeStyle = useThemeStyles();
 
   useEffect(() => {
     (async () => {
@@ -36,8 +40,8 @@ export default function MapScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar />
+    <SafeAreaView style={[styles.container, themeStyle.background]}>
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
         {errorMsg ? (
           <View style={styles.errorContainer}>
             <Text>{errorMsg}</Text>
@@ -59,6 +63,7 @@ export default function MapScreen() {
             showsUserLocation={true}
             provider={PROVIDER_GOOGLE}
             showsMyLocationButton
+            customMapStyle={theme === 'dark' ? mapDarkStyle : undefined}
           >
             {
               locations.map((marker, index) => (

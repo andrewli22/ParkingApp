@@ -1,13 +1,13 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View, StatusBar } from 'react-native';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
 import { fetchAllCarparks } from '@/utils/api';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Footer from '../components/Footer';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function HomeScreen() {
   const [allCarparks, setAllCarparks] = useState<Record<string, string>>({});
@@ -15,6 +15,7 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get device theme
+  const { theme } = useTheme();
   const themeStyle = useThemeStyles();
 
   // Fetch all carparks only once on mount
@@ -167,7 +168,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, themeStyle.background]}>
-      <StatusBar />
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       <SectionList
         style={styles.carParkListContainer}
         sections={sectionData}
