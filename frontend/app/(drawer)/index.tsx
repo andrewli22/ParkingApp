@@ -8,6 +8,7 @@ import { fetchAllCarparks } from '@/utils/api';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Footer from '../components/Footer';
 import { useTheme } from '../contexts/ThemeContext';
+import AdMobComponent from '../components/AdMobComponent';
 
 export default function HomeScreen() {
   const [allCarparks, setAllCarparks] = useState<Record<string, string>>({});
@@ -103,7 +104,6 @@ export default function HomeScreen() {
       await handleStoreCarparks({ id, carpark });
     } catch (error) {
       console.error('Error pinning carpark:', error);
-      // Revert optimistic update on error
       setPinnedCarparks(prev => {
         const { [id]: removed, ...rest } = prev;
         return rest;
@@ -124,7 +124,6 @@ export default function HomeScreen() {
       await removePinnedCarpark(id);
     } catch (error) {
       console.error('Error unpinning carpark:', error);
-      // Revert optimistic update on error
       setPinnedCarparks(prev => ({ ...prev, [id]: originalValue }));
     }
   }, [pinnedCarparks]);
@@ -175,11 +174,12 @@ export default function HomeScreen() {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={(item) => item.id}
-        removeClippedSubviews={true} // Performance optimization
-        maxToRenderPerBatch={20} // Performance optimization
-        updateCellsBatchingPeriod={50} // Performance optimization
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={20}
+        updateCellsBatchingPeriod={50}
       />
       <Footer />
+      <AdMobComponent />
     </SafeAreaView>
   );
 }
