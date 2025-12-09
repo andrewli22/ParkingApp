@@ -8,7 +8,6 @@ import { fetchAllCarparks } from '@/utils/api';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Footer from '../components/Footer';
 import { useTheme } from '../contexts/ThemeContext';
-import AdMobComponent from '../components/AdMobComponent';
 
 export default function HomeScreen() {
   const [allCarparks, setAllCarparks] = useState<Record<string, string>>({});
@@ -179,7 +178,6 @@ export default function HomeScreen() {
         updateCellsBatchingPeriod={50}
       />
       <Footer />
-      <AdMobComponent />
     </SafeAreaView>
   );
 }
