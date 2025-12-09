@@ -16,8 +16,8 @@ export default function IssuesScreen() {
   return (
     <View style={[themeStyle.background, { flex: 1 }]}>
       {/* Information on reporting issue */}
-      <View style={{ margin: 20, gap: 10 }}>
-        <Text style={[themeStyle.textColor, { fontSize: 15 }]}>Please include as much detail as possible to help diagnose and resolve the issue. Such as:</Text>
+      <View style={{ margin: 20 }}>
+        <Text style={[themeStyle.textColor, { fontSize: 15, marginBottom: 10 }]}>Please include as much detail as possible to help diagnose and resolve the issue. Such as:</Text>
         <View>
           <FlatList
             data={data}
@@ -32,16 +32,16 @@ export default function IssuesScreen() {
         </View>
       </View>
       {/* User Inputs */}
-      <View style={{ gap: 10, marginHorizontal: 20 }}>
+      <View style={{ marginHorizontal: 20 }}>
         <TextInput
           placeholderTextColor={themeStyle.textColor.color}
           placeholder="Name"
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
         />
         <TextInput
           placeholderTextColor={themeStyle.textColor.color}
           placeholder="Email address"
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
         />
         {/* FIX ISSUE
           Issue: Text Colour not updating based on theme
@@ -52,7 +52,7 @@ export default function IssuesScreen() {
           placeholderTextColor={themeStyle.textColor.color}
           multiline
           placeholder="Describe the issue"
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200 }]}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200, marginBottom: 10 }]}
         />
         <TouchableOpacity style={styles.submitButtonContainer}>
           <Text style={styles.buttonText}>Submit</Text>

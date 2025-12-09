@@ -1,6 +1,5 @@
-const express = require('express');
-const sgMail = require('@sendgrid/mail');
-require('dotenv').config();
+import { sendEmail } from './services/emailService.js';
+import express from 'express';
 
 const app = express();
 app.use(express.json());
@@ -23,6 +22,7 @@ app.get('/api/carparks', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch carparks' });
   }
 });
+
 // Fetch carpark by ID
 app.get('/api/carparks/:id', async (req, res) => {
   try {
@@ -39,6 +39,20 @@ app.get('/api/carparks/:id', async (req, res) => {
   }
 });
 
+/**
+ * Email Api
+ */
+app.post('/api/feedback', async (req, res) => {
+  const { name, subject, message } = req.body;
+
+  try {
+    await sendEmail(name, subject, message);
+    res.json({ success: true, message: 'Feedback sent successfully' });
+  } catch (error) {
+    console.error('Error sending feedback:', error);
+    res.status(500).json({ error: 'Failed to send feedback' });
+  }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {

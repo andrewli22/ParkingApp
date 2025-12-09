@@ -47,32 +47,25 @@ export const fetchCarparkById = async (id: string) => {
 };
 
 // Send feedback email
-export const sendFeedback = async (name: string, email: string, message: string) => {
+export const sendFeedback = async (name: string, subject: string, message: string) => {
   try {
-    console.log('Submit button clicked - frontend')
-    console.log(name)
-    console.log(email)
-    console.log(message)
     const response = await fetch(`${BASE_URL}/feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: name, email: email, message: message })
+      body: JSON.stringify({ name: name, subject: subject, message: message })
     })
-    console.log(response);
     if (!response.ok) {
       if (response.status === 404) {
-        console.log('here');
         return null;
       }
       throw new Error(`Failed to send review: ${response.statusText}`);
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(`API error sending feedback: ${error}`);
+    console.error(error);
     throw error;
   }
 }

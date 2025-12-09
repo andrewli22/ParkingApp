@@ -1,14 +1,18 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Andrew Li",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.947.0",
     "@sendgrid/mail": "^8.1.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0"

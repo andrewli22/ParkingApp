@@ -175,8 +175,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 30,
-    transform: [{ translateY: -20 }]
+    paddingVertical: 30,
+    transform: [{ translateY: -60 }]
   },
   chartContainer: {
     position: 'relative',
@@ -209,23 +209,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '80%',
     paddingHorizontal: 20,
+    marginTop: 30
   },
   legendItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: 'center'
   },
   legendDotGreen: {
     width: 20,
     height: 20,
     borderRadius: '100%',
     backgroundColor: '#00D100',
+    marginRight: 8,
   },
   legendDotRed: {
     width: 20,
     height: 20,
     borderRadius: '100%',
     backgroundColor: '#FF2E2E',
+    marginRight: 8,
   },
   legendText: {
     fontSize: 17,
@@ -238,10 +240,10 @@ const styles = StyleSheet.create({
   updateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   clockIcon: {
     fontSize: 14,
+    marginRight: 6,
   },
   lastUpdatedText: {
     fontSize: 15,

@@ -10,7 +10,7 @@ export default function FeedbackScreen() {
 
   // User inputs
   const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [subject, setSubject] = useState<string>('');
   const [feedback, setFeedback] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -18,9 +18,7 @@ export default function FeedbackScreen() {
   const handleSendFeedback = async () => {
     setErrorMessage('');
     try {
-      console.log('button clicked');
-      const res = await sendFeedback(name, email, feedback);
-      console.log(`success: ${res}`);
+      const res = await sendFeedback(name, subject, feedback);
       setSuccess(true);
     } catch (error) {
       console.error('API error sending feedback - frontend', error);
@@ -30,28 +28,28 @@ export default function FeedbackScreen() {
 
   return (
     <View style={[styles.container, themeStyle.background, { flex: 1 }]}>
-      <View style={{ flexDirection:'row', justifyContent: 'center', marginHorizontal: 20, marginTop: 20}}>
-        <Text style={[themeStyle.textColor, { fontSize: 15, textAlign: 'center' }]}>Please provide your feedback below</Text>
+      <View style={{ flexDirection:'row', justifyContent: 'center', marginHorizontal: 20, marginTop: 10}}>
+        <Text style={[themeStyle.textColor, { fontSize: 15, textAlign: 'center', marginBottom: 15 }]}>Please provide your feedback below</Text>
       </View>
-      <View style={{ gap:10, marginHorizontal: 20 }}>
+      <View style={{ marginHorizontal: 20 }}>
         <TextInput
           placeholder='Name'
           placeholderTextColor={themeStyle.textColor.color}
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
           onChangeText={setName}
         />
         <TextInput
-          placeholder='Email address'
+          placeholder='Enter Subject'
           placeholderTextColor={themeStyle.textColor.color}
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor]}
-          onChangeText={setEmail}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
+          onChangeText={setSubject}
           />
         <TextInput
           key={theme}
           multiline
           placeholder='Enter feedback'
           placeholderTextColor={themeStyle.textColor.color}
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200 }]}
+          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200, marginBottom: 10 }]}
           onChangeText={setFeedback}
         />
       </View>
@@ -77,7 +75,7 @@ export default function FeedbackScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 20,
+    paddingVertical: 20,
   },
   textInputStyles: {
     borderWidth: 2,
