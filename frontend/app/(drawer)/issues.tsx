@@ -2,7 +2,6 @@ import { useThemeStyles } from '@/utils/themeStyles';
 import React, { useContext, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemeContext } from '../contexts/ThemeContext';
-import FeedbackScreen from './feedback';
 import { sendFeedback } from '@/utils/api';
 
 export default function IssuesScreen() {

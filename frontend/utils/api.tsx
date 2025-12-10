@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 
 const BASE_URL = Constants.expoConfig.extra.apiBaseUrl;
+
 // Fetch all the carparks
 export const fetchAllCarparks = async () => {
   try {

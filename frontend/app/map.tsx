@@ -29,7 +29,6 @@ export default function MapScreen() {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
     })();
@@ -66,9 +65,15 @@ export default function MapScreen() {
             customMapStyle={theme === 'dark' ? mapDarkStyle : undefined}
           >
             {
-              locations.map((marker, index) => (
-                <Marker key={index} coordinate={marker} onPress={() => handleMarkerPress(marker)} />
-              ))
+              locations.map((marker, index) => {
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={marker}
+                    onPress={() => handleMarkerPress(marker)}
+                  />
+                );
+              })
             }
           </MapView>
         )}
