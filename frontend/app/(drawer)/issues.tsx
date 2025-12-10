@@ -1,17 +1,38 @@
 import { useThemeStyles } from '@/utils/themeStyles';
-import React, { useContext } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemeContext } from '../contexts/ThemeContext';
+import FeedbackScreen from './feedback';
+import { sendFeedback } from '@/utils/api';
 
 export default function IssuesScreen() {
   const data = [
     'The error that you saw',
-    'The time which you saw the error',
     'Which screen you saw the error',
     'What you did that led to the error'
   ]
   const themeStyle = useThemeStyles();
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const [name, setName] = useState<string>('');
+  const [subject, setSubject] = useState<string>('');
+  const [issue, setIssue] = useState<string>('');
+
+  const handleSendIssue = async () => {
+    try {
+      await sendFeedback(name, `BUG: ${subject}`, issue);
+      Alert.alert(
+        'Success',
+        'Issue successfully. A team member will review it soon!',
+        [{ text: 'OK', onPress: () => {
+          setName('');
+          setSubject('');
+          setIssue('');
+        }}]
+      );
+    } catch (error) {
+      console.error('API error sending feedback - frontend', error);
+    }
+  }
 
   return (
     <View style={[themeStyle.background, { flex: 1 }]}>
@@ -37,24 +58,30 @@ export default function IssuesScreen() {
           placeholderTextColor={themeStyle.textColor.color}
           placeholder="Name"
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
-        />
+          onChangeText={setName}
+          value={name}
+          />
         <TextInput
           placeholderTextColor={themeStyle.textColor.color}
-          placeholder="Email address"
+          placeholder="Subject"
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
-        />
+          onChangeText={setSubject}
+          value={subject}
+          />
         {/* FIX ISSUE
           Issue: Text Colour not updating based on theme
           Curr Soln: Use key which re-renders on change, text is not preserved, users will have to type text again but colour updates correctly
-        */}
+          */}
         <TextInput
           key={theme}
           placeholderTextColor={themeStyle.textColor.color}
           multiline
           placeholder="Describe the issue"
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200, marginBottom: 10 }]}
+          onChangeText={setIssue}
+          value={issue}
         />
-        <TouchableOpacity style={styles.submitButtonContainer}>
+        <TouchableOpacity style={styles.submitButtonContainer} onPress={() => handleSendIssue()}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>

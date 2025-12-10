@@ -1,6 +1,6 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { sendFeedback } from '@/utils/api';
 
@@ -12,14 +12,21 @@ export default function FeedbackScreen() {
   const [name, setName] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [feedback, setFeedback] = useState<string>('');
-  const [success, setSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleSendFeedback = async () => {
     setErrorMessage('');
     try {
-      const res = await sendFeedback(name, subject, feedback);
-      setSuccess(true);
+      await sendFeedback(name, `FEEDBACK: ${subject}`, feedback);
+      Alert.alert(
+        'Success',
+        'Thank you for your feedback. A team member will review it soon!',
+        [{ text: 'OK', onPress: () => {
+          setName('');
+          setSubject('');
+          setFeedback('');
+        }}]
+      );
     } catch (error) {
       console.error('API error sending feedback - frontend', error);
       setErrorMessage('Failed to send feedback. Please try again.');
@@ -37,12 +44,14 @@ export default function FeedbackScreen() {
           placeholderTextColor={themeStyle.textColor.color}
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
           onChangeText={setName}
+          value={name}
         />
         <TextInput
           placeholder='Enter Subject'
           placeholderTextColor={themeStyle.textColor.color}
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
           onChangeText={setSubject}
+          value={subject}
           />
         <TextInput
           key={theme}
@@ -51,21 +60,15 @@ export default function FeedbackScreen() {
           placeholderTextColor={themeStyle.textColor.color}
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { height: 200, marginBottom: 10 }]}
           onChangeText={setFeedback}
+          value={feedback}
         />
       </View>
       <TouchableOpacity style={[styles.submitButtonContainer, { marginHorizontal: 20 }]} onPress={() => handleSendFeedback()}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
-      {/* Success message */}
-      {success && (
-        <Text style={[themeStyle.textColor]}>
-          Thanks for your feedback. A team member will review it soon!
-        </Text>
-      )}
-      
       {/* Error message */}
       {errorMessage && (
-        <Text style={[{ color: 'red' }]}>
+        <Text style={[{ color: 'red', textAlign: 'center', marginTop: 10 }]}>
           {errorMessage}
         </Text>
       )}
