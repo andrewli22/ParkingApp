@@ -8,6 +8,7 @@ import { locations } from '../locations';
 import { useTheme } from './contexts/ThemeContext';
 import { useThemeStyles } from '@/utils/themeStyles';
 import { mapDarkStyle } from '@/utils/mapStyles';
+import { fetchCarparkOccupancy } from '@/utils/api';
 
 interface Carpark {
   facilityId: string,
@@ -19,23 +20,54 @@ interface Carpark {
 export default function MapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [occupancy, setOccupancy] = useState<Record<string, {'available': number, 'total': number, 'spots': number}>>({});
   const { theme } = useTheme();
   const themeStyle = useThemeStyles();
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+    const fetchLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+        const location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      } catch (error) {
+        setErrorMsg('Error getting location');
+        console.error('Location error:', error);
       }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
+  };
+  fetchLocation();
+}, []);
+
+  useEffect(() => {
+    const fetchOccupancy = async () => {
+      try {
+        const res = await fetchCarparkOccupancy();
+        setOccupancy(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchOccupancy();
   }, []);
 
   const handleMarkerPress = (carpark: Carpark) => {
     router.push(`/carpark/${carpark.facilityId}?facilityName=${encodeURIComponent(carpark.suburb)}`);
+  };
+
+  const getMarkerColour = (total: number, spots: number) => {
+    const occupiedPercent = Math.round((total / spots) * 100);
+    const vacantPercent = 100 - occupiedPercent;
+    if (vacantPercent >= 75) {
+      return '#3ab600ff';
+    } else if (10 < vacantPercent && vacantPercent < 75) {
+      return '#ffa600ff';
+    } else {
+      return '#ff0000ff';
+    }
   };
 
   return (
@@ -65,13 +97,31 @@ export default function MapScreen() {
             customMapStyle={theme === 'dark' ? mapDarkStyle : undefined}
           >
             {
-              locations.map((marker, index) => {
+              locations.map((marker) => {
+                const data = occupancy[marker.facilityId];
+                const available = data.available;
+                const total = data.total || 0;
+                const spots = data.spots || 1;
+                const color = getMarkerColour(total, spots);
+
                 return (
                   <Marker
-                    key={index}
+                    key={marker.facilityId}
                     coordinate={marker}
                     onPress={() => handleMarkerPress(marker)}
-                  />
+                  >
+                    <View style={styles.markerContainer}>
+                      <View style={[styles.markerBubble, { backgroundColor: color }]}>
+                        <Text style={styles.markerText}>
+                          {available !== undefined ? available : '...'}
+                        </Text>
+                      </View>
+                      <View style={styles.arrowContainer}>
+                        <View style={styles.markerArrowBorder} />
+                        <View style={[styles.markerArrow, { borderTopColor: color }]} />
+                      </View>
+                    </View>
+                  </Marker>
                 );
               })
             }
@@ -95,5 +145,45 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  markerContainer: {
+    alignItems: 'center',
+  },
+  markerBubble: {
+    padding: 3,
+    paddingHorizontal: 3,
+    borderRadius: '30%',
+    borderBottomColor: 'transparent'
+  },
+  markerText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12
+  },
+  arrowContainer: {
+    position: 'relative',
+    alignItems: 'center',
+  },
+  markerArrowBorder: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    transform: [{ translateY: -0.1 }],
+    zIndex: 1,
+  },
+  markerArrow: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    transform: [{ translateY: -2 }],
+    zIndex: 2,
   },
 });

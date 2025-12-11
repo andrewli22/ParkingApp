@@ -50,11 +50,11 @@ export default {
     extra: {
       apiBaseUrl: process.env.API_BASE_URL,
       eas: {
-        projectId: '5780fbe1-0b2b-4887-a5ce-4498e6703f2b'
+        projectId: process.env.PROJECT_ID
       }
     },
     updates: {
-      url: 'https://u.expo.dev/5780fbe1-0b2b-4887-a5ce-4498e6703f2b'
+      url: process.env.EXPO_URL
     },
     runtimeVersion: '1.0.0'
   },

@@ -47,6 +47,17 @@ export const fetchCarparkById = async (id: string) => {
   }
 };
 
+// Fetch Carpark Occupancy
+export const fetchCarparkOccupancy = async () => {
+  try {
+    const data = await fetch(`${BASE_URL}/carparks/occupancy`).then((res) => res.json());
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 // Send feedback email
 export const sendFeedback = async (name: string, subject: string, message: string) => {
   try {

@@ -6,9 +6,8 @@ import { sendFeedback } from '@/utils/api';
 
 export default function IssuesScreen() {
   const data = [
-    'The error that you saw',
-    'Which screen you saw the error',
-    'What you did that led to the error'
+    'The error that appeared',
+    'Where you saw the error',
   ]
   const themeStyle = useThemeStyles();
   const { theme, toggleTheme } = useContext(ThemeContext);
