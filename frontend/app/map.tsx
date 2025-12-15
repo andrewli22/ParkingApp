@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text, SafeAreaView, StatusBar} from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, StatusBar, Modal, TouchableOpacity, Pressable } from 'react-native';
 import Footer from './components/Footer';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
@@ -9,6 +9,8 @@ import { useTheme } from './contexts/ThemeContext';
 import { useThemeStyles } from '@/utils/themeStyles';
 import { mapDarkStyle } from '@/utils/mapStyles';
 import { fetchCarparkOccupancy } from '@/utils/api';
+import { showLocation } from 'react-native-map-link';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 interface Carpark {
   facilityId: string,
@@ -21,8 +23,13 @@ export default function MapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [occupancy, setOccupancy] = useState<Record<string, {'available': number, 'total': number, 'spots': number}>>({});
+  const [selectCarpark, setSelectCarpark] = useState<Carpark>();
+
   const { theme } = useTheme();
   const themeStyle = useThemeStyles();
+  
+  const snapPoints = useMemo(() => ['30%'], []);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -38,9 +45,9 @@ export default function MapScreen() {
         setErrorMsg('Error getting location');
         console.error('Location error:', error);
       }
-  };
-  fetchLocation();
-}, []);
+    };
+    fetchLocation();
+  }, []);
 
   useEffect(() => {
     const fetchOccupancy = async () => {
@@ -55,7 +62,8 @@ export default function MapScreen() {
   }, []);
 
   const handleMarkerPress = (carpark: Carpark) => {
-    router.push(`/carpark/${carpark.facilityId}?facilityName=${encodeURIComponent(carpark.suburb)}`);
+    setSelectCarpark(carpark);
+    bottomSheetRef.current?.expand();
   };
 
   const getMarkerColour = (total: number, spots: number) => {
@@ -69,6 +77,14 @@ export default function MapScreen() {
       return '#ff0000ff';
     }
   };
+
+  const handleGetDirections = (latitude: number, longitude: number, name: string) => {
+    showLocation({
+      latitude: latitude,
+      longitude: longitude,
+      title: name
+    })
+  }
 
   return (
     <SafeAreaView style={[styles.container, themeStyle.background]}>
@@ -99,10 +115,10 @@ export default function MapScreen() {
             {
               locations.map((marker) => {
                 const data = occupancy[marker.facilityId];
-                const available = data.available;
-                const total = data.total || 0;
-                const spots = data.spots || 1;
-                const color = getMarkerColour(total, spots);
+                const available = data?.available;
+                const total = data?.total || 0;
+                const spots = data?.spots || 1;
+                const color = data ? getMarkerColour(total, spots) : '#999';
 
                 return (
                   <Marker
@@ -128,6 +144,40 @@ export default function MapScreen() {
           </MapView>
         )}
       <Footer />
+      <BottomSheet
+        snapPoints={snapPoints}
+        ref={bottomSheetRef}
+        index={-1}
+        enablePanDownToClose={true}
+        handleIndicatorStyle={{ backgroundColor: theme === 'dark' ? 'white' : 'black' }}
+        backgroundStyle={themeStyle.background}
+      >
+        <BottomSheetView style={styles.bottomSheetcontentContainer}>
+          <View style={{ alignItems: 'center' }}>
+            <Text style={[themeStyle.textColor, { fontSize: 18, fontWeight: 'bold' }]}>
+              {selectCarpark?.suburb || 'Carpark Details'}
+            </Text>
+            {selectCarpark && occupancy[selectCarpark.facilityId] && (
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 25, color: getMarkerColour(occupancy[selectCarpark.facilityId].total, occupancy[selectCarpark.facilityId].spots), marginTop: 8, marginBottom: 15 }}>
+                  {occupancy[selectCarpark.facilityId].available} Vacant Spots
+                </Text>
+                <Text style={[themeStyle.textColor, { fontSize: 16 }]}>
+                  Total: {occupancy[selectCarpark.facilityId].spots}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={{ width: '100%', marginBottom: 40 }}>
+            <TouchableOpacity
+              style={styles.submitButtonContainer}
+              onPress={() => selectCarpark && handleGetDirections(selectCarpark.latitude, selectCarpark.longitude, selectCarpark.suburb)}
+            >
+              <Text style={styles.buttonText}>Get Directions</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -186,4 +236,22 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -2 }],
     zIndex: 2,
   },
+  bottomSheetcontentContainer: {
+    padding: 10,
+    height: '100%',
+    flex: 1,
+    justifyContent: 'space-between'
+  },
+  submitButtonContainer: {
+    backgroundColor: '#34ceff',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 25,
+    marginHorizontal: 15
+  },
+  buttonText: {
+    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16
+  }
 });

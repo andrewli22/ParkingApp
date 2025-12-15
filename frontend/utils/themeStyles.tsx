@@ -13,7 +13,7 @@ export const useThemeStyles = () => {
   return {
     background: { backgroundColor: isDark ? 'black' : '#f2f2f2' },
     textColor: { color: isDark ? 'white' : 'black' },
-    sectionHeader: { backgroundColor: isDark ? '#3e4444' : '#b2b2b2' },
+    sectionHeader: { backgroundColor: isDark ? '#2a2a2aff' : '#b2b2b2' },
     borderColor: { borderColor: isDark ? 'white' : 'black' },
   };
 }

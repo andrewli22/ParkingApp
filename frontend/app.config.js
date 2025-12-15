@@ -15,6 +15,10 @@ export default {
       bundleIdentifier: 'com.b3ef.parkingapp',
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
+      },
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription: 'This app needs access to your location to show nearby parking spots on the map.',
+        NSLocationAlwaysAndWhenInUseUsageDescription: 'This app needs access to your location to show nearby parking spots on the map.'
       }
     },
     android: {

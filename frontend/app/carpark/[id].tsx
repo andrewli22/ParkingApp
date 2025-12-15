@@ -1,12 +1,14 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { fetchCarparkById } from '@/utils/api';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { showLocation } from 'react-native-map-link';
+import { locations } from '../../locations';
 
 export default function CarparkScreen() {
   // Get device theme
@@ -90,6 +92,21 @@ export default function CarparkScreen() {
     return date.toLocaleDateString();
   };
 
+  const handleGetDirections = (id: string) => {
+    let lat = 0;
+    let long = 0;
+    for (const loc of locations) {
+      if (loc.facilityId == id) {
+        lat = loc.latitude;
+        long = loc.longitude;
+      }
+    }
+    showLocation({
+      latitude: lat,
+      longitude: long,
+      title: facilityName
+    })
+  };
   
   return (
     <>
@@ -111,10 +128,11 @@ export default function CarparkScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View>
-            <Text style={[themeStyle.textColor, { fontSize: 25 }]}>Number of spots available</Text>
-          </View>
-          <View style={styles.pieChart}>
+          {/* Carpark Information */}
+          <View style={styles.topSection}>
+            <View style={{ marginVertical: 50 }}>
+              <Text style={[themeStyle.textColor, { fontSize: 25 }]}>Number of spots available</Text>
+            </View>
             <View style={styles.chartContainer}>
               <PieChart
                 donut
@@ -131,7 +149,7 @@ export default function CarparkScreen() {
                 <Text style={[styles.chartPercentage, themeStyle.textColor]}>{vacantPercent < 0 ? 0 : vacantPercent}% available</Text>
               </View>
             </View>
-            
+
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
                 <View style={styles.legendDotGreen} />
@@ -153,6 +171,12 @@ export default function CarparkScreen() {
               </View>
             </View>
           </View>
+          {/* Get Directions Button */}
+          <View style={styles.bottomSection}>
+            <TouchableOpacity style={styles.submitButtonContainer} onPress={() => handleGetDirections(facilityId)}>
+              <Text style={styles.buttonText}>Get Directions</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </>
@@ -166,17 +190,15 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 20,
   },
-  pieChart: {
-    height: '100%',
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
+  topSection: {
     alignItems: 'center',
-    paddingVertical: 30,
-    transform: [{ translateY: -60 }]
+  },
+  bottomSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
   chartContainer: {
     position: 'relative',
@@ -249,4 +271,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     opacity: 0.6,
   },
+  submitButtonContainer: {
+    backgroundColor: '#34ceff',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 25
+  },
+  buttonText: {
+    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 16
+  }
 });
