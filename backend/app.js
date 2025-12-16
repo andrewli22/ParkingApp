@@ -68,7 +68,8 @@ app.get('/api/carparks/occupancy', async (req, res) => {
         if (data && data.facility_id && data.occupancy && data.occupancy.total !== undefined) {
           const spots = parseInt(data.spots) || 0;
           const total = parseInt(data.occupancy.total) || 0;
-          occupancyCache[data.facility_id] = {'available': spots - total, 'total': total, 'spots': spots};
+          const diff = spots - total
+          occupancyCache[data.facility_id] = {'available': diff < 0 ? 0 : diff, 'total': total, 'spots': spots};
         }
       });
 

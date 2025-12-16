@@ -21,21 +21,7 @@
       "output": "static"
     },
     "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "iosAppId": "ca-app-pub-8458641881172480~9035607678"
-        }
-      ]
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true

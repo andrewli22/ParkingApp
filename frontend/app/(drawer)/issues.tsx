@@ -65,11 +65,7 @@ export default function IssuesScreen() {
           style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
           onChangeText={setSubject}
           value={subject}
-          />
-        {/* FIX ISSUE
-          Issue: Text Colour not updating based on theme
-          Curr Soln: Use key which re-renders on change, text is not preserved, users will have to type text again but colour updates correctly
-          */}
+        />
         <TextInput
           key={theme}
           placeholderTextColor={themeStyle.textColor.color}

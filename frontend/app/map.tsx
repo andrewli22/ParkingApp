@@ -82,7 +82,8 @@ export default function MapScreen() {
     showLocation({
       latitude: latitude,
       longitude: longitude,
-      title: name
+      title: name,
+      googleForceLatLon: true,
     })
   }
 

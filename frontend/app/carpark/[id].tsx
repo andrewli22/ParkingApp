@@ -104,7 +104,8 @@ export default function CarparkScreen() {
     showLocation({
       latitude: lat,
       longitude: long,
-      title: facilityName
+      title: facilityName,
+      googleForceLatLon: true
     })
   };
   
