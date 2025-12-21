@@ -48,7 +48,7 @@ app.get('/api/carparks/occupancy', async (req, res) => {
 
     // Fetch data in batches and cache them
     const BATCH_SIZE = 5
-    const DELAY = 1000
+    const DELAY = 900
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     for (let i = 0; i < Object.keys(carparks).length; i += BATCH_SIZE) {

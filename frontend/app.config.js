@@ -13,6 +13,11 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.b3ef.parkingapp',
+      icon: {
+        light: './assets/icons/ios-light.png',
+        dark: './assets/icons/ios-dark.png',
+        tinted: './assets/icons/ios-tinted.png'
+      },
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
       },
@@ -23,7 +28,8 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        foregroundImage: './assets/icons/adaptive-icon.png'
       },
       edgeToEdgeEnabled: true,
       package: 'com.b3ef.parkingapp',
@@ -42,9 +48,13 @@ export default {
       [
         'expo-splash-screen',
         {
-          imageWidth: 200,
-          resizeMode: 'contain',
-          backgroundColor: '#ffffff'
+          backgroundColor: '#FFFFFF',
+          image: './assets/icons/splash-icon-light.png',
+          dark: {
+            image: './assets/icons/splash-icon-light.png',
+            backgroundColor: '#000000'
+          },
+          imageWidth: 200
         }
       ]
     ],

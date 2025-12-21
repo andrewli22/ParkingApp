@@ -25,7 +25,7 @@ export default function DrawerLayout() {
         name='index'
         options={{
           drawerLabel: 'Home',
-          title: 'Carparks',
+          title: 'Carpark',
         }}
       />
       <Drawer.Screen

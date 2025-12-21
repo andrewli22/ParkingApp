@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { useThemeStyles } from '@/utils/themeStyles';
 
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: '#f5f5f5',
+    marginBottom: Platform.OS === 'android' ? 20 : 0
   },
   segmentedControl: {
     flexDirection: 'row',
