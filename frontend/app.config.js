@@ -12,6 +12,7 @@ export default {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      buildNumber: "2",
       bundleIdentifier: 'com.b3ef.parkingapp',
       icon: {
         light: './assets/icons/ios-light.png',
@@ -55,8 +56,8 @@ export default {
             backgroundColor: '#000000'
           },
           imageWidth: 200
-        }
-      ]
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true
