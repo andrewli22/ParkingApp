@@ -1,11 +1,12 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import { router } from 'expo-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { SafeAreaView, SectionList, StyleSheet, Text, TouchableOpacity, View, StatusBar } from 'react-native';
+import { SectionList, StyleSheet, Text, TouchableOpacity, View, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
 import { fetchAllCarparks } from '@/utils/api';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Footer from '../components/Footer';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -137,11 +138,11 @@ export default function HomeScreen() {
         <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
         {section.title === 'Pinned' ? (
           <TouchableOpacity onPress={() => handleUnpinCarpark(item.id)}>
-            <AntDesign name="star" size={24} color="gold" />
+            <FontAwesome name="star" size={24} color="gold" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={() => handlePinCarpark(item.id, item.name)}>
-            <AntDesign name="staro" size={24} color={themeStyle.textColor.color} />
+            <FontAwesome name="star-o" size={24} color={themeStyle.textColor.color} />
           </TouchableOpacity>
         )}
       </View>

@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, Text, SafeAreaView, StatusBar, Modal, TouchableOpacity, Pressable } from 'react-native';
+import { StyleSheet, View, Text, StatusBar, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Footer from './components/Footer';
 import * as Location from 'expo-location';
-import { router } from 'expo-router';
 import { locations } from '../locations';
 import { useTheme } from './contexts/ThemeContext';
 import { useThemeStyles } from '@/utils/themeStyles';
@@ -30,6 +30,7 @@ export default function MapScreen() {
   
   const snapPoints = useMemo(() => ['30%'], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     const fetchLocation = async () => {
@@ -41,6 +42,15 @@ export default function MapScreen() {
         }
         const location = await Location.getCurrentPositionAsync({});
         setLocation(location);
+
+        if (mapRef.current) {
+          mapRef.current.animateToRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }, 0);
+        }
       } catch (error) {
         setErrorMsg('Error getting location');
         console.error('Location error:', error);
@@ -84,6 +94,7 @@ export default function MapScreen() {
       longitude: longitude,
       title: name,
       googleForceLatLon: true,
+      alwaysIncludeGoogle: true
     })
   }
 
@@ -96,13 +107,9 @@ export default function MapScreen() {
           </View>
         ) : (
           <MapView
+            ref={mapRef}
             style={styles.map}
-            initialRegion={location ? {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            } : {
+            initialRegion={{
               latitude: -33.8688,
               longitude: 151.2093,
               latitudeDelta: 0.0922,

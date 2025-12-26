@@ -12,7 +12,7 @@ export default {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
-      buildNumber: "2",
+      buildNumber: "4",
       bundleIdentifier: 'com.b3ef.parkingapp',
       icon: {
         light: './assets/icons/ios-light.png',
@@ -24,7 +24,8 @@ export default {
       },
       infoPlist: {
         NSLocationWhenInUseUsageDescription: 'This app needs access to your location to show nearby parking spots on the map.',
-        NSLocationAlwaysAndWhenInUseUsageDescription: 'This app needs access to your location to show nearby parking spots on the map.'
+        NSLocationAlwaysAndWhenInUseUsageDescription: 'This app needs access to your location to show nearby parking spots on the map.',
+        ITSAppUsesNonExemptEncryption: false
       }
     },
     android: {

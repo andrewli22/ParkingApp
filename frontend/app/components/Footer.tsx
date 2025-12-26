@@ -8,11 +8,15 @@ export default function Footer() {
   const themeStyle = useThemeStyles();
 
   const handleNavigateToMap = () => {
-    router.push('/map');
+    if (pathname !== '/map') {
+      router.push('/map');
+    }
   }
 
   const handleNavigateToNames = () => {
-    router.back();
+    if (pathname !== '/') {
+      router.back();
+    }
   }
 
   const isNameActive = pathname === '/';
