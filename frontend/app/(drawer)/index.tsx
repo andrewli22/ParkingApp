@@ -136,15 +136,17 @@ export default function HomeScreen() {
     <TouchableOpacity onPress={() => handleCarparkPress(item)}>
       <View style={styles.carParkItemRow}>
         <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
-        {section.title === 'Pinned' ? (
-          <TouchableOpacity onPress={() => handleUnpinCarpark(item.id)}>
-            <FontAwesome name="star" size={24} color="gold" />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => handlePinCarpark(item.id, item.name)}>
-            <FontAwesome name="star-o" size={24} color={themeStyle.textColor.color} />
-          </TouchableOpacity>
-        )}
+        <View style={styles.pinned}>
+          {section.title === 'Pinned' ? (
+            <TouchableOpacity onPress={() => handleUnpinCarpark(item.id)}>
+              <FontAwesome name="star" size={24} color="gold" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => handlePinCarpark(item.id, item.name)}>
+              <FontAwesome name="star-o" size={24} color={themeStyle.textColor.color} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   ), [themeStyle, handlePinCarpark, handleUnpinCarpark, handleCarparkPress]);
@@ -166,7 +168,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.container, themeStyle.background]}>
+    <SafeAreaView style={[styles.container, themeStyle.background]} edges={['bottom']}>
       <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       <SectionList
         style={styles.carParkListContainer}
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 10,
   },
-  carParkItemRow: {
+   carParkItemRow: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -214,6 +216,9 @@ const styles = StyleSheet.create({
   },
   textSize: {
     fontSize: 15
+  },
+  pinned: {
+    height: '100%',
   },
   loadingContainer: {
     flex: 1,

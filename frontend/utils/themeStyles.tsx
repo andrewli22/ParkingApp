@@ -11,9 +11,9 @@ export const useThemeStyles = () => {
   const isDark = theme === 'dark';
 
   return {
-    background: { backgroundColor: isDark ? 'black' : '#f2f2f2' },
+    background: { backgroundColor: isDark ? 'black' : 'white' },
     textColor: { color: isDark ? 'white' : 'black' },
-    sectionHeader: { backgroundColor: isDark ? '#2a2a2aff' : '#b2b2b2' },
+    sectionHeader: { backgroundColor: isDark ? '#2a2a2aff' : '#e1e1e1ff' },
     borderColor: { borderColor: isDark ? 'white' : 'black' },
   };
 }

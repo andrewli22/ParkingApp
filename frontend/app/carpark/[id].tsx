@@ -106,6 +106,7 @@ export default function CarparkScreen() {
       longitude: long,
       title: facilityName,
       googleForceLatLon: true,
+      alwaysIncludeGoogle: true
     })
   };
   
@@ -140,9 +141,9 @@ export default function CarparkScreen() {
                 radius={150}
                 innerRadius={130}
                 data={pieData}
-                backgroundColor={theme === 'light' ? '#f2f2f2' : 'black'}
+                backgroundColor={theme === 'light' ? 'white' : 'black'}
                 strokeWidth={2}
-                strokeColor={theme === 'light' ? '#fff' : '#121212'}
+                strokeColor={theme === 'light' ? 'white' : 'black'}
               />
               <View style={styles.chartTextContainer}>
                 <Text style={[styles.chartMainNumber, themeStyle.textColor]}>{spots - total < 0 ? 0 : spots - total}</Text>

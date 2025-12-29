@@ -12,7 +12,7 @@ export default {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
-      buildNumber: "4",
+      buildNumber: "10",
       bundleIdentifier: 'com.b3ef.parkingapp',
       icon: {
         light: './assets/icons/ios-light.png',
