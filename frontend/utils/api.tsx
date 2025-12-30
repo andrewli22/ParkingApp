@@ -59,14 +59,14 @@ export const fetchCarparkOccupancy = async () => {
 }
 
 // Send feedback email
-export const sendFeedback = async (name: string, subject: string, message: string) => {
+export const sendFeedback = async (subject: string, message: string) => {
   try {
     const response = await fetch(`${BASE_URL}/feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: name, subject: subject, message: message })
+      body: JSON.stringify({ subject: subject, message: message })
     })
     if (!response.ok) {
       if (response.status === 404) {

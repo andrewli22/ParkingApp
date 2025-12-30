@@ -9,7 +9,6 @@ export default function FeedbackScreen() {
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   // User inputs
-  const [name, setName] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [feedback, setFeedback] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -17,12 +16,11 @@ export default function FeedbackScreen() {
   const handleSendFeedback = async () => {
     setErrorMessage('');
     try {
-      await sendFeedback(name, `FEEDBACK: ${subject}`, feedback);
+      await sendFeedback(`FEEDBACK: ${subject}`, feedback);
       Alert.alert(
         'Success',
         'Thank you for your feedback. A team member will review it soon!',
         [{ text: 'OK', onPress: () => {
-          setName('');
           setSubject('');
           setFeedback('');
         }}]
@@ -39,13 +37,6 @@ export default function FeedbackScreen() {
         <Text style={[themeStyle.textColor, { fontSize: 15, textAlign: 'center', marginBottom: 15 }]}>Please provide your feedback below</Text>
       </View>
       <View style={{ marginHorizontal: 20 }}>
-        <TextInput
-          placeholder='Name'
-          placeholderTextColor={themeStyle.textColor.color}
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
-          onChangeText={setName}
-          value={name}
-        />
         <TextInput
           placeholder='Enter Subject'
           placeholderTextColor={themeStyle.textColor.color}

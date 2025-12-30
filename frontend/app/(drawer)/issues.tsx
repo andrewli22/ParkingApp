@@ -11,18 +11,16 @@ export default function IssuesScreen() {
   ]
   const themeStyle = useThemeStyles();
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const [name, setName] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
   const [issue, setIssue] = useState<string>('');
 
   const handleSendIssue = async () => {
     try {
-      await sendFeedback(name, `BUG: ${subject}`, issue);
+      await sendFeedback(`BUG: ${subject}`, issue);
       Alert.alert(
         'Success',
         'Issue successfully. A team member will review it soon!',
         [{ text: 'OK', onPress: () => {
-          setName('');
           setSubject('');
           setIssue('');
         }}]
@@ -52,13 +50,6 @@ export default function IssuesScreen() {
       </View>
       {/* User Inputs */}
       <View style={{ marginHorizontal: 20 }}>
-        <TextInput
-          placeholderTextColor={themeStyle.textColor.color}
-          placeholder="Name"
-          style={[styles.textInputStyles, themeStyle.borderColor, themeStyle.textColor, { marginBottom: 10 }]}
-          onChangeText={setName}
-          value={name}
-          />
         <TextInput
           placeholderTextColor={themeStyle.textColor.color}
           placeholder="Subject"
