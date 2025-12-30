@@ -1,7 +1,7 @@
 import { useThemeStyles } from '@/utils/themeStyles';
 import { router } from 'expo-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { SectionList, StyleSheet, Text, TouchableOpacity, View, StatusBar } from 'react-native';
+import { SectionList, StyleSheet, Text, TouchableOpacity, View, StatusBar, Touchable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchPinnedCarparks, handleStoreCarparks, removePinnedCarpark } from '../../utils/storage';
 import { CarParkDataType, SectionDataType } from '../../utils/types';
@@ -133,22 +133,21 @@ export default function HomeScreen() {
   }, []);
 
   const renderItem = useCallback(({ item, section }: { item: CarParkDataType; section: SectionDataType }) => (
-    <TouchableOpacity onPress={() => handleCarparkPress(item)}>
-      <View style={styles.carParkItemRow}>
+    <View style={styles.carParkItemRow}>
+      <TouchableOpacity style={styles.textTouchable} onPress={() => handleCarparkPress(item)}>
         <Text style={[styles.textSize, themeStyle.textColor]}>{item.name}</Text>
-        <View style={styles.pinned}>
-          {section.title === 'Pinned' ? (
-            <TouchableOpacity onPress={() => handleUnpinCarpark(item.id)}>
-              <FontAwesome name="star" size={24} color="gold" />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={() => handlePinCarpark(item.id, item.name)}>
-              <FontAwesome name="star-o" size={24} color={themeStyle.textColor.color} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.starTouchable}
+        onPress={() => section.title === 'Pinned' ? handleUnpinCarpark(item.id) : handlePinCarpark(item.id, item.name)}
+      >
+        <FontAwesome 
+          name={section.title === 'Pinned' ? "star" : "star-o"} 
+          size={24} 
+          color={section.title === 'Pinned' ? "gold" : themeStyle.textColor.color} 
+        />
+      </TouchableOpacity>
+    </View>
   ), [themeStyle, handlePinCarpark, handleUnpinCarpark, handleCarparkPress]);
 
   const renderSectionHeader = useCallback(({ section: { title } }: { section: { title: string } }) => (
@@ -201,9 +200,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 12,
-    marginBottom: 0,
-    marginHorizontal: 5
+    paddingLeft: 10,
+    paddingVertical: 3
   },
   sectionHeader: {
     width: '100%',
@@ -215,10 +213,19 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   textSize: {
-    fontSize: 15
+    fontSize: 15,
+    height: '100%'
   },
-  pinned: {
+  textTouchable: {
+    padding: 12,
     height: '100%',
+    flex: 1
+  },
+  starTouchable: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    height: '100%'
   },
   loadingContainer: {
     flex: 1,
