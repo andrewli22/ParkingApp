@@ -6,7 +6,7 @@ This personal project was built to learn React Native and explore mobile app dev
 
 ## Tech Stack
 - **Frontend**: React Native (Expo), TypeScript
-- **Backend**: Express.js, Node.js
+- **Backend**: Express.js
 - **APIs**: TfNSW, AWS SES, Google Maps SDK
 - **Hosting**: Fly.io
 
