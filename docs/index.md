@@ -16,7 +16,7 @@ This Privacy Policy describes how ParkCount ("we", "our", or "the app") handles 
 ## Information We Collect
 
 ### Location Data
-- **Purpose**: We request access to your device's location solely to show nearby carparks and center the map on your current position.
+- **Purpose**: We request access to your device's location solely to show nearby carparks and centre the map on your current position.
 - **Storage**: Your location data is NOT stored, transmitted to our servers, or shared with third parties. It is only used in real-time within the app.
 - **Permissions**: Location access is only requested when you use the map feature. You can control location permissions through your device settings at any time.
 
@@ -43,7 +43,7 @@ Our app uses the following third-party services to provide functionality:
 
 ### Google Maps API
 - **Purpose**: Displays interactive maps and carpark locations
-- **Data Shared**: Your device's location (when you grant permission) to display the map centered on your position
+- **Data Shared**: Your device's location (when you grant permission) to display the map centred on your position
 - **Privacy Policy**: [Google Maps Privacy Policy](https://policies.google.com/privacy)
 
 ### Transport for NSW (TfNSW) API
