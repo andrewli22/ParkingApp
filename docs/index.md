@@ -85,7 +85,7 @@ You have the right to:
 
 If you have questions or concerns about this Privacy Policy, please contact us at:
 
-**Email**: [your-email@example.com]
+**Email**: [parkcount1@gmail.com](parkcount1@gmail.com)
 
 ---
 
