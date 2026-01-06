@@ -48,8 +48,6 @@ async function refreshOccupancyCache() {
         if (data && data.facility_id && data.occupancy && data.occupancy.total !== undefined) {
           const spots = parseInt(data.spots) || 0;
           const total = parseInt(data.occupancy.total) || 0;
-          // FIX: Remove 90 so its just spots - total
-          // const diff = spots - total - 90;
           const diff = spots - total;
           occupancyCache[data.facility_id] = {
             'available': diff < 0 ? 0 : diff,
