@@ -107,6 +107,7 @@ export default function MapScreen() {
           </View>
         ) : (
           <MapView
+            key={theme}
             ref={mapRef}
             style={styles.map}
             initialRegion={{

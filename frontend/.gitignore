@@ -45,3 +45,6 @@ app-example
 # Native folders
 ios/
 android/
+
+# Keystore
+keystores/
